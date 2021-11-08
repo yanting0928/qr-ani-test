@@ -11,7 +11,7 @@ import numpy
 #from aniserver import ANIRPCCalculator
 
 master_params_str ="""
-  restraints = ase cctbx
+  restraints = ani cctbx
     .type = choice(multi=False)
   minimizer = lbfgs lbfgs_b lbfgs_ase
     .type = choice(multi=False)
@@ -69,7 +69,7 @@ class aniserver_tg_calculator(object):
     calc = ANIRPCCalculator()
     self.model.set_sites_cart(sites_cart = self.sites_cart+flex.vec3_double(self.x))
     self.ase_atoms = ase_atoms_from_model(model=self.model)
-    self.ase_atoms.set_calculator(calc) 
+    self.ase_atoms.set_calculator(calc)
     target = self.ase_atoms.get_potential_energy()
     gradients = self.ase_atoms.get_forces().tolist()
     g = flex.double([g for gradient in gradients for g in gradient])
@@ -144,30 +144,23 @@ class minimizer_unbound(object):
     return self.f, self.g
 
 class minimizer_ase(object):
-  def __init__(self, engine, calculator, max_iterations, stpmax=0.04): 
+  def __init__(self, engine, calculator, max_iterations, stpmax=0.04):
     # stpmax=0.04 is the default in ASE
-    self.calculator = calculator  
+    self.calculator = calculator
     self.max_iterations = max_iterations
     self.ase_atoms = calculator.ase_atoms
     self.x = self.calculator.get_shift()
     self.f = None
     self.engine = engine
-    if (self.engine in ["cctbx"]):
-      self.ase_atoms.set_positions(flex.vec3_double(self.calculator.x))
-    self.minimizer = LBFGS(atoms = self.ase_atoms)    
+    self.ase_atoms.set_positions(flex.vec3_double(self.calculator.x))
+    self.minimizer = LBFGS(atoms = self.ase_atoms, maxstep=stpmax)
     self.n_func_evaluations = 0
     self.run(nstep = max_iterations)
     self.calculator.apply_shift()
-  
+
   def step(self):
-    sites_cart = flex.vec3_double(self.minimizer.atoms.get_positions()) 
-    if (self.engine not in ["cctbx"]):
-      from libtbx.test_utils import approx_equal
-      if approx_equal(sites_cart, self.calculator.sites_cart,out=None):
-        sites_cart = self.calculator.x      
-      else:
-        sites_cart = sites_cart - self.calculator.sites_cart
-    f,g = self.calculator.target_and_gradients(x = sites_cart)
+    x = flex.vec3_double(self.minimizer.atoms.get_positions())
+    f,g = self.calculator.target_and_gradients(x = x)
     self.f = f
     forces = numpy.array(g) * (-1)
     self.minimizer.step(forces)
@@ -177,7 +170,7 @@ class minimizer_ase(object):
     for i in range(nstep):
       v = self.step()
 
-from ase import Atoms 
+from ase import Atoms
 def ase_atoms_from_model(model):
   positions = []
   symbols = []
@@ -195,7 +188,7 @@ def ase_atoms_from_model(model):
 def run(params, file_name):
   # Check inputs
   assert params.minimizer in ["lbfgs", "lbfgs_b", "lbfgs_ase"]
-  assert params.restraints in ["cctbx", "ase"]
+  assert params.restraints in ["cctbx", "ani"]
   assert params.stpmax is not None
   assert params.max_itarations is not None and type(params.max_itarations)==int
   assert params.macro_cycles  is not None and type(params.macro_cycles)==int
@@ -208,9 +201,9 @@ def run(params, file_name):
   for macro_cycle in range(1, params.macro_cycles):
     if(params.restraints == "cctbx"):
       calculator = cctbx_tg_calculator(model = model)
-    else:
-      assert params.restraints == "ase"
+    elif(params.restraints == "ani"):
       calculator = aniserver_tg_calculator(model = model)
+    else: assert 0 # safeguard
     if(params.minimizer == "lbfgs_ase"):
       minimized = minimizer_ase(
         engine         = params.restraints,
@@ -220,23 +213,23 @@ def run(params, file_name):
     elif(params.minimizer == "lbfgs"):
       assert params.gradient_only in [True, False]
       minimized = minimizer_unbound(
-        calculator     = calculator, 
+        calculator     = calculator,
         max_iterations = params.max_itarations,
         gradient_only  = params.gradient_only,
         stpmax         = params.stpmax)
     elif(params.minimizer == "lbfgs_b"):
       minimized = minimizer_bound(
-        calculator     = calculator, 
+        calculator     = calculator,
         max_iterations = params.max_itarations,
-        stpmax         = params.stpmax, 
+        stpmax         = params.stpmax,
         use_bounds     = 2).run()
     else: assert 0 # safeguard
-  print "Final target value:", minimized.f
+    print "macro_cycle: %3d target value: %15.6f" % (macro_cycle, minimized.f)
   #
   prefix = "%s_%s_stpmax%s_maxiter%s_gronly%s"%(
-    params.restraints, 
-    params.minimizer, 
-    str("%7.2f"%params.stpmax).strip(), 
+    params.restraints,
+    params.minimizer,
+    str("%7.2f"%params.stpmax).strip(),
     str("%7.2f"%params.max_itarations).strip(),
     str(params.gradient_only))
   with open("%s.pdb"%prefix,"w") as fo:
