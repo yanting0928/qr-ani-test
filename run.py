@@ -8,7 +8,28 @@ from mmtbx.ncs import tncs
 from libtbx import adopt_init_args
 from ase.optimize.lbfgs import LBFGS
 import numpy
-from aniserver import ANIRPCCalculator
+#from aniserver import ANIRPCCalculator
+
+master_params_str ="""
+  restraints = ase cctbx
+    .type = choice(multi=False)
+  minimizer = lbfgs lbfgs_b lbfgs_ase
+    .type = choice(multi=False)
+  stpmax = None
+    .type = float
+  gradients_only = None
+    .type = bool
+  max_itarations = None
+    .type = int
+  macro_cycles = None
+    .type = int
+  gradient_only = None
+    .type = bool
+"""
+
+def get_master_phil():
+  return mmtbx.command_line.generate_master_phil_with_inputs(
+    phil_string = master_params_str)
 
 class cctbx_tg_calculator(object):
 
@@ -88,9 +109,7 @@ class minimizer_bound(object):
     self.n_func_evaluations += 1
     f, g = self.calculator.target_and_gradients(x = self.x)
     self.f = f
-#    self.g = g.as_double()
     self.g = g
-    print self.n_func_evaluations, self.f
     return self.x, self.f, self.g
 
 class minimizer_unbound(object):
@@ -122,19 +141,20 @@ class minimizer_unbound(object):
     f, g = self.calculator.target_and_gradients(x = self.x)
     self.f = f
     self.g = g
-    print self.n_func_evaluations, self.f
     return self.f, self.g
 
 class minimizer_ase(object):
-  def __init__(self, engine, calculator, max_iterations): 
+  def __init__(self, engine, calculator, max_iterations, stpmax=0.04): 
+    # stpmax=0.04 is the default in ASE
     self.calculator = calculator  
     self.max_iterations = max_iterations
     self.ase_atoms = calculator.ase_atoms
     self.x = self.calculator.get_shift()
+    self.f = None
     self.engine = engine
     if (self.engine in ["cctbx"]):
       self.ase_atoms.set_positions(flex.vec3_double(self.calculator.x))
-    self.minimizer =  LBFGS(atoms = self.ase_atoms)    
+    self.minimizer = LBFGS(atoms = self.ase_atoms)    
     self.n_func_evaluations = 0
     self.run(nstep = max_iterations)
     self.calculator.apply_shift()
@@ -148,10 +168,10 @@ class minimizer_ase(object):
       else:
         sites_cart = sites_cart - self.calculator.sites_cart
     f,g = self.calculator.target_and_gradients(x = sites_cart)
+    self.f = f
     forces = numpy.array(g) * (-1)
     self.minimizer.step(forces)
     self.n_func_evaluations += 1
-    print self.n_func_evaluations, f
 
   def run(self, nstep):
     for i in range(nstep):
@@ -172,37 +192,59 @@ def ase_atoms_from_model(model):
         positions.append(list(atom.xyz))
   return Atoms(symbols=symbols, positions=positions, pbc=True, cell=unit_cell)
 
-def run(args):
-#  assert len(args)==1, args
-  pdb_inp = iotbx.pdb.input(file_name = args[0])
+def run(params, file_name):
+  # Check inputs
+  assert params.minimizer in ["lbfgs", "lbfgs_b", "lbfgs_ase"]
+  assert params.restraints in ["cctbx", "ase"]
+  assert params.stpmax is not None
+  assert params.max_itarations is not None and type(params.max_itarations)==int
+  assert params.macro_cycles  is not None and type(params.macro_cycles)==int
+  assert params.max_itarations > 0
+  assert params.macro_cycles > 0
+  #
+  pdb_inp = iotbx.pdb.input(file_name = file_name)
   model = mmtbx.model.manager(model_input = pdb_inp, log = null_out())
   model.process(make_restraints=True)
-  engine = args[1].strip()
-  if (engine in ["cctbx"]):
-    calculator = cctbx_tg_calculator(model = model)
-  else:
-    calculator = aniserver_tg_calculator(model = model)
-  lbfgs_c = int(args[2])    #  0 - ase_lbfgs, 1 - cctbx_unbond, 2 - cctbx_bound
-  if (lbfgs_c==0):
-    minimized = minimizer_ase(
-      engine                = engine,
-      calculator            = calculator,
-      max_iterations        = 50)
-  elif (lbfgs_c==1):
-    minimized = minimizer_unbound(
-      calculator     = calculator, 
-      max_iterations = 50,
-      gradient_only  = False,
-      stpmax         = 1.e+9)
-  else:
-    minimized = minimizer_bound(
-      calculator     = calculator, 
-      max_iterations = 50,
-      stpmax         = 1.e+9, 
-      use_bounds     = 2).run()
+  for macro_cycle in range(1, params.macro_cycles):
+    if(params.restraints == "cctbx"):
+      calculator = cctbx_tg_calculator(model = model)
+    else:
+      assert params.restraints == "ase"
+      calculator = aniserver_tg_calculator(model = model)
+    if(params.minimizer == "lbfgs_ase"):
+      minimized = minimizer_ase(
+        engine         = params.restraints,
+        calculator     = calculator,
+        max_iterations = params.max_itarations,
+        stpmax         = params.stpmax)
+    elif(params.minimizer == "lbfgs"):
+      assert params.gradient_only in [True, False]
+      minimized = minimizer_unbound(
+        calculator     = calculator, 
+        max_iterations = params.max_itarations,
+        gradient_only  = params.gradient_only,
+        stpmax         = params.stpmax)
+    elif(params.minimizer == "lbfgs_b"):
+      minimized = minimizer_bound(
+        calculator     = calculator, 
+        max_iterations = params.max_itarations,
+        stpmax         = params.stpmax, 
+        use_bounds     = 2).run()
+    else: assert 0 # safeguard
+  print "Final target value:", minimized.f
   #
-  with open("minimized_cctbx.pdb","w") as fo:
+  prefix = "%s_%s_stpmax%s_maxiter%s_gronly%s"%(
+    params.restraints, 
+    params.minimizer, 
+    str("%7.2f"%params.stpmax).strip(), 
+    str("%7.2f"%params.max_itarations).strip(),
+    str(params.gradient_only))
+  with open("%s.pdb"%prefix,"w") as fo:
     fo.write(model.model_as_pdb())
 
 if (__name__ == "__main__"):
-  run(args = sys.argv[1:])
+  args = sys.argv[1:]
+  cmdline = mmtbx.utils.process_command_line_args(
+    args          = args,
+    master_params = get_master_phil())
+  run(params = cmdline.params.extract(), file_name = cmdline.pdb_file_names[0])
