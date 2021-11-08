@@ -26,7 +26,6 @@ class cctbx_tg_calculator(object):
     es = self.model.get_restraints_manager().energies_sites(
       sites_cart        = self.sites_cart+flex.vec3_double(self.x),
       compute_gradients = True)
-    print(list(es.gradients.as_double()))
     return es.target, es.gradients.as_double()
 
   def apply_shift(self):
@@ -37,33 +36,28 @@ class aniserver_tg_calculator(object):
 
   def __init__(self, model):
     self.model = model
-#    self.x = flex.double(self.model.size()*3, 0)
+    self.x = flex.double(self.model.size()*3, 0)
     self.sites_cart = self.model.get_sites_cart()
     self.ase_atoms = ase_atoms_from_model(model=self.model)
-    self.x = self.sites_cart.as_double()
 
   def get_shift(self):
     return self.x
 
   def target_and_gradients(self, x):
     self.x = x
-    c = self.model
     calc = ANIRPCCalculator()
-    c.set_sites_cart(sites_cart =c.get_sites_cart()+flex.vec3_double(self.x))
-    self.ase_atoms = ase_atoms_from_model(model=c)
+    self.model.set_sites_cart(sites_cart = self.sites_cart+flex.vec3_double(self.x))
+    self.ase_atoms = ase_atoms_from_model(model=self.model)
     self.ase_atoms.set_calculator(calc) 
     target = self.ase_atoms.get_potential_energy()
     gradients = self.ase_atoms.get_forces().tolist()
     g = flex.double([g for gradient in gradients for g in gradient])
-    print list(g)
-#    target = target * (-1)
     g = g * (-1)
-#    print target, list(g)
     return target, g.as_double()
 
-  def apply_shift(self):
+  def apply_shift(self ):
     self.model.set_sites_cart(
-      sites_cart = self.model.get_sites_cart()+flex.vec3_double(self.x))
+      sites_cart = self.sites_cart + flex.vec3_double(self.x))
 
 class minimizer_bound(object):
   def __init__(self,
@@ -132,11 +126,14 @@ class minimizer_unbound(object):
     return self.f, self.g
 
 class minimizer_ase(object):
-  def __init__(self, calculator, max_iterations): 
+  def __init__(self, engine, calculator, max_iterations): 
     self.calculator = calculator  
     self.max_iterations = max_iterations
     self.ase_atoms = calculator.ase_atoms
-    self.ase_atoms.set_positions(flex.vec3_double(self.calculator.x))
+    self.x = self.calculator.get_shift()
+    self.engine = engine
+    if (self.engine in ["cctbx"]):
+      self.ase_atoms.set_positions(flex.vec3_double(self.calculator.x))
     self.minimizer =  LBFGS(atoms = self.ase_atoms)    
     self.n_func_evaluations = 0
     self.run(nstep = max_iterations)
@@ -144,7 +141,12 @@ class minimizer_ase(object):
   
   def step(self):
     sites_cart = flex.vec3_double(self.minimizer.atoms.get_positions()) 
-    print ("moving sites_cart", list(sites_cart))
+    if (self.engine not in ["cctbx"]):
+      from libtbx.test_utils import approx_equal
+      if approx_equal(sites_cart, self.calculator.sites_cart,out=None):
+        sites_cart = self.calculator.x      
+      else:
+        sites_cart = sites_cart - self.calculator.sites_cart
     f,g = self.calculator.target_and_gradients(x = sites_cart)
     forces = numpy.array(g) * (-1)
     self.minimizer.step(forces)
@@ -183,8 +185,9 @@ def run(args):
   lbfgs_c = int(args[2])    #  0 - ase_lbfgs, 1 - cctbx_unbond, 2 - cctbx_bound
   if (lbfgs_c==0):
     minimized = minimizer_ase(
+      engine                = engine,
       calculator            = calculator,
-      max_iterations        = 2)
+      max_iterations        = 50)
   elif (lbfgs_c==1):
     minimized = minimizer_unbound(
       calculator     = calculator, 
