@@ -1,0 +1,245 @@
+Starting Q|R
+version:   v1.0-208-g2886d5-dirty  
+Running refinement
+   input {
+     xray_data {
+       file_name = None
+       labels = None
+       high_resolution = None
+       low_resolution = None
+       outliers_rejection = True
+       french_wilson_scale = True
+       french_wilson {
+         max_bins = 60
+         min_bin_size = 40
+       }
+       sigma_fobs_rejection_criterion = None
+       sigma_iobs_rejection_criterion = None
+       ignore_all_zeros = True
+       force_anomalous_flag_to_be_equal_to = None
+       convert_to_non_anomalous_if_ratio_pairs_lone_less_than_threshold = 0.5
+       r_free_flags {
+         file_name = None
+         label = None
+         test_flag_value = None
+         ignore_r_free_flags = False
+         disable_suitability_test = False
+         ignore_pdb_hexdigest = False
+         generate = False
+         fraction = 0.1
+         max_free = 2000
+         lattice_symmetry_max_delta = 5
+         use_lattice_symmetry = True
+         use_dataman_shells = False
+         n_shells = 20
+       }
+     }
+     pdb {
+       file_name = None
+     }
+     monomers {
+       file_name = None
+     }
+     maps {
+       map_file_name = None
+       d_min = None
+       map_coefficients_file_name = None
+       map_coefficients_label = None
+     }
+     sequence = None
+     scattering_table = wk1995 it1992 *n_gaussian neutron electron
+     wavelength = None
+     energy = None
+     twin_law = Auto
+   }
+   max_atoms = 15000
+   debug = False
+   cluster {
+     fast_interaction = True
+     charge_cutoff = 8.0
+     clustering = false
+     charge_embedding = False
+     two_buffers = False
+     maxnum_residues_in_cluster = 15
+     select_within_radius = 10
+     clustering_method = gnc *bcc
+     altloc_method = average *subtract
+     g_scan = 10 15 20
+     g_mode = None
+     save_clusters = True
+     bond_with_altloc = True
+     re_calculate_rmsd_tolerance = 0.5
+   }
+   restraints = cctbx *qm
+   expansion = False
+   quantum {
+     engine_name = mopac ani *torchani terachem turbomole pyscf orca gaussian \
+                   xtb
+     basis = Auto
+     charge = None
+     method = Auto
+     memory = None
+     nproc = None
+     qm_addon = gcp dftd3 gcp-d3
+     qm_addon_method = None
+   }
+   refine {
+     dry_run = False
+     sf_algorithm = *direct fft
+     refinement_target_name = *ml ls_wunit_k1
+     mode = *opt refine gtest
+     number_of_macro_cycles = 1
+     number_of_weight_search_cycles = 50
+     number_of_refine_cycles = 5
+     number_of_micro_cycles = 100
+     data_weight = None
+     choose_best_use_r_work = False
+     skip_weight_search = False
+     adjust_restraints_weight_scale_value = 2
+     max_iterations_weight = 50
+     max_iterations_refine = 50
+     use_ase_lbfgs = False
+     line_search = True
+     stpmax = 0.2
+     gradient_only = true
+     update_all_scales = True
+     refine_sites = True
+     refine_adp = False
+     restraints_weight_scale = 1.0
+     shake_sites = False
+     use_convergence_test = True
+     max_bond_rmsd = 0.03
+     max_r_work_r_free_gap = 5.0
+     r_tolerance = 0.001
+     rmsd_tolerance = 0.01
+     opt_log = False
+     pre_opt = False
+     pre_opt_stpmax = 0.1
+     pre_opt_iter = 10
+     pre_opt_switch = 2
+     pre_opt_gconv = 3000
+     minimizer = *lbfgs lbfgsb
+   }
+   parallel {
+     method = *multiprocessing slurm pbs sge lsf threading
+     nproc = None
+     qsub_command = None
+   }
+   output_file_name_prefix = None
+   output_folder_name = "pdb"
+   rst_file = None
+   dump_gradients = None
+
+Setting QM defaults
+  Setting QM method to HF
+  Setting QM basis to 6-31g
+
+
+***********************************************************
+restart info will be stored in /home/yanting/work/aniserver_1_qr/ani_qr_test/cctbx_lbfgs/qr-ani-test/qr-ani/lbfgs/0.9/pdb/6.rst.pickle
+***********************************************************
+
+start: bond:  0.014 angle:   1.42 clash:  11.0 rota:  0.00 rama: f: 100.00 o:   0.00 Z:  -5.68 cb:   0.00
+cycle:   0 max_shift: 0.446412 LBFGS: function start/end, n_calls: -1746102.007399 -1746159.775154 101
+cycle:   1 max_shift: 0.380812 LBFGS: function start/end, n_calls: -1746159.775154 -1746167.439109 101
+cycle:   2 max_shift: 0.219116 LBFGS: function start/end, n_calls: -1746167.439109 -1746171.263026 101
+cycle:   3 max_shift: 0.157349 LBFGS: function start/end, n_calls: -1746171.263026 -1746173.525801 101
+cycle:   4 max_shift: 0.103848 LBFGS: function start/end, n_calls: -1746173.525801 -1746174.762402 101
+cycle:   5 max_shift: 0.054680 LBFGS: function start/end, n_calls: -1746174.762402 -1746175.363834 101
+cycle:   6 max_shift: 0.034583 LBFGS: function start/end, n_calls: -1746175.363834 -1746175.787006 101
+cycle:   7 max_shift: 0.030361 LBFGS: function start/end, n_calls: -1746175.787006 -1746176.057126 101
+cycle:   8 max_shift: 0.034878 LBFGS: function start/end, n_calls: -1746176.057126 -1746176.343181 101
+cycle:   9 max_shift: 0.020606 LBFGS: function start/end, n_calls: -1746176.343181 -1746176.570438 101
+cycle:  10 max_shift: 0.036312 LBFGS: function start/end, n_calls: -1746176.570438 -1746176.820436 101
+cycle:  11 max_shift: 0.024602 LBFGS: function start/end, n_calls: -1746176.820436 -1746177.047469 101
+cycle:  12 max_shift: 0.019953 LBFGS: function start/end, n_calls: -1746177.047469 -1746177.233883 101
+cycle:  13 max_shift: 0.019858 LBFGS: function start/end, n_calls: -1746177.233883 -1746177.385064 101
+cycle:  14 max_shift: 0.019694 LBFGS: function start/end, n_calls: -1746177.385064 -1746177.550084 101
+cycle:  15 max_shift: 0.025990 LBFGS: function start/end, n_calls: -1746177.550084 -1746177.750636 101
+cycle:  16 max_shift: 0.009348 LBFGS: function start/end, n_calls: -1746177.750636 -1746177.884686 101
+cycle:  17 max_shift: 0.224322 LBFGS: function start/end, n_calls: -1746177.884686 -1746179.189135 101
+cycle:  18 max_shift: 0.025783 LBFGS: function start/end, n_calls: -1746179.189135 -1746179.872478 101
+cycle:  19 max_shift: 0.009205 LBFGS: function start/end, n_calls: -1746179.872478 -1746179.961048 101
+cycle:  20 max_shift: 0.020391 LBFGS: function start/end, n_calls: -1746179.961048 -1746180.109685 101
+cycle:  21 max_shift: 0.007041 LBFGS: function start/end, n_calls: -1746180.109685 -1746180.222491 101
+cycle:  22 max_shift: 0.008382 LBFGS: function start/end, n_calls: -1746180.222491 -1746180.293705 101
+cycle:  23 max_shift: 0.006116 LBFGS: function start/end, n_calls: -1746180.293705 -1746180.351081 101
+cycle:  24 max_shift: 0.003770 LBFGS: function start/end, n_calls: -1746180.351081 -1746180.389456 101
+cycle:  25 max_shift: 0.037741 LBFGS: function start/end, n_calls: -1746180.389456 -1746180.634068 101
+cycle:  26 max_shift: 0.010005 LBFGS: function start/end, n_calls: -1746180.634068 -1746180.766024 101
+cycle:  27 max_shift: 0.011445 LBFGS: function start/end, n_calls: -1746180.766024 -1746180.855042 101
+cycle:  28 max_shift: 0.006470 LBFGS: function start/end, n_calls: -1746180.855042 -1746180.911893 101
+cycle:  29 max_shift: 0.005695 LBFGS: function start/end, n_calls: -1746180.911893 -1746180.968895 101
+cycle:  30 max_shift: 0.008303 LBFGS: function start/end, n_calls: -1746180.968895 -1746181.030384 101
+cycle:  31 max_shift: 0.005047 LBFGS: function start/end, n_calls: -1746181.030384 -1746181.066665 101
+cycle:  32 max_shift: 0.004646 LBFGS: function start/end, n_calls: -1746181.066665 -1746181.103394 101
+cycle:  33 max_shift: 0.009067 LBFGS: function start/end, n_calls: -1746181.103394 -1746181.171616 101
+cycle:  34 max_shift: 0.004548 LBFGS: function start/end, n_calls: -1746181.171616 -1746181.210216 101
+cycle:  35 max_shift: 0.004079 LBFGS: function start/end, n_calls: -1746181.210216 -1746181.233854 101
+cycle:  36 max_shift: 0.004256 LBFGS: function start/end, n_calls: -1746181.233854 -1746181.263926 101
+cycle:  37 max_shift: 0.004666 LBFGS: function start/end, n_calls: -1746181.263926 -1746181.302076 101
+cycle:  38 max_shift: 0.005068 LBFGS: function start/end, n_calls: -1746181.302076 -1746181.335888 101
+cycle:  39 max_shift: 0.004951 LBFGS: function start/end, n_calls: -1746181.335888 -1746181.371495 101
+cycle:  40 max_shift: 0.004324 LBFGS: function start/end, n_calls: -1746181.371495 -1746181.400968 101
+cycle:  41 max_shift: 0.007898 LBFGS: function start/end, n_calls: -1746181.400968 -1746181.448395 101
+cycle:  42 max_shift: 0.004988 LBFGS: function start/end, n_calls: -1746181.448395 -1746181.494774 101
+cycle:  43 max_shift: 0.005200 LBFGS: function start/end, n_calls: -1746181.494774 -1746181.523349 101
+cycle:  44 max_shift: 0.005831 LBFGS: function start/end, n_calls: -1746181.523349 -1746181.565838 101
+cycle:  45 max_shift: 0.004543 LBFGS: function start/end, n_calls: -1746181.565838 -1746181.599201 101
+cycle:  46 max_shift: 0.003439 LBFGS: function start/end, n_calls: -1746181.599201 -1746181.626281 101
+cycle:  47 max_shift: 0.003745 LBFGS: function start/end, n_calls: -1746181.626281 -1746181.647301 101
+cycle:  48 max_shift: 0.002761 LBFGS: function start/end, n_calls: -1746181.647301 -1746181.670790 101
+cycle:  49 max_shift: 0.002858 LBFGS: function start/end, n_calls: -1746181.670790 -1746181.688369 101
+cycle:  50 max_shift: 0.007455 LBFGS: function start/end, n_calls: -1746181.688369 -1746181.681487 101
+cycle:  51 max_shift: 0.005279 LBFGS: function start/end, n_calls: -1746181.681487 -1746181.773198 101
+cycle:  52 max_shift: 0.003989 LBFGS: function start/end, n_calls: -1746181.773198 -1746181.792946 101
+cycle:  53 max_shift: 0.002130 LBFGS: function start/end, n_calls: -1746181.792946 -1746181.812096 101
+cycle:  54 max_shift: 0.003520 LBFGS: function start/end, n_calls: -1746181.812096 -1746181.829825 101
+cycle:  55 max_shift: 0.004453 LBFGS: function start/end, n_calls: -1746181.829825 -1746181.860196 101
+cycle:  56 max_shift: 0.005593 LBFGS: function start/end, n_calls: -1746181.860196 -1746181.741780 101
+cycle:  57 max_shift: 0.006248 LBFGS: function start/end, n_calls: -1746181.741780 -1746181.914878 101
+cycle:  58 max_shift: 0.002524 LBFGS: function start/end, n_calls: -1746181.914878 -1746181.935749 101
+cycle:  59 max_shift: 0.002995 LBFGS: function start/end, n_calls: -1746181.935749 -1746181.959462 101
+cycle:  60 max_shift: 0.016070 LBFGS: function start/end, n_calls: -1746181.959462 -1746181.978088 101
+cycle:  61 max_shift: 0.008250 LBFGS: function start/end, n_calls: -1746181.978088 -1746182.030527 101
+cycle:  62 max_shift: 0.006797 LBFGS: function start/end, n_calls: -1746182.030527 -1746181.620745 101
+cycle:  63 max_shift: 0.007483 LBFGS: function start/end, n_calls: -1746181.620745 -1746182.075784 101
+cycle:  64 max_shift: 0.002791 LBFGS: function start/end, n_calls: -1746182.075784 -1746182.095532 101
+cycle:  65 max_shift: 0.002329 LBFGS: function start/end, n_calls: -1746182.095532 -1746182.112812 101
+cycle:  66 max_shift: 0.002973 LBFGS: function start/end, n_calls: -1746182.112812 -1746182.133384 101
+cycle:  67 max_shift: 0.002793 LBFGS: function start/end, n_calls: -1746182.133384 -1746182.150215 101
+cycle:  68 max_shift: 0.002354 LBFGS: function start/end, n_calls: -1746182.150215 -1746182.163231 101
+cycle:  69 max_shift: 0.002214 LBFGS: function start/end, n_calls: -1746182.163231 -1746182.182605 101
+cycle:  70 max_shift: 0.002244 LBFGS: function start/end, n_calls: -1746182.182605 -1746182.192554 101
+cycle:  71 max_shift: 0.001948 LBFGS: function start/end, n_calls: -1746182.192554 -1746182.209086 101
+cycle:  72 max_shift: 0.001553 LBFGS: function start/end, n_calls: -1746182.209086 -1746182.218736 101
+cycle:  73 max_shift: 0.006302 LBFGS: function start/end, n_calls: -1746182.218736 -1746182.252323 101
+cycle:  74 max_shift: 0.002419 LBFGS: function start/end, n_calls: -1746182.252323 -1746182.272222 101
+cycle:  75 max_shift: 0.001537 LBFGS: function start/end, n_calls: -1746182.272222 -1746182.282919 101
+cycle:  76 max_shift: 0.001207 LBFGS: function start/end, n_calls: -1746182.282919 -1746182.291596 101
+cycle:  77 max_shift: 0.001471 LBFGS: function start/end, n_calls: -1746182.291596 -1746182.292943 101
+cycle:  78 max_shift: 0.001568 LBFGS: function start/end, n_calls: -1746182.292943 -1746182.305585 101
+cycle:  79 max_shift: 0.002651 LBFGS: function start/end, n_calls: -1746182.305585 -1746182.324136 101
+cycle:  80 max_shift: 0.001717 LBFGS: function start/end, n_calls: -1746182.324136 -1746182.332440 101
+cycle:  81 max_shift: 0.001798 LBFGS: function start/end, n_calls: -1746182.332440 -1746182.348074 101
+cycle:  82 max_shift: 0.002080 LBFGS: function start/end, n_calls: -1746182.348074 -1746182.354806 101
+cycle:  83 max_shift: 0.001597 LBFGS: function start/end, n_calls: -1746182.354806 -1746182.374330 101
+cycle:  84 max_shift: 0.000970 LBFGS: function start/end, n_calls: -1746182.374330 -1746182.376874 101
+cycle:  85 max_shift: 0.001548 LBFGS: function start/end, n_calls: -1746182.376874 -1746182.384878 101
+cycle:  86 max_shift: 0.001687 LBFGS: function start/end, n_calls: -1746182.384878 -1746182.396248 101
+cycle:  87 max_shift: 0.001455 LBFGS: function start/end, n_calls: -1746182.396248 -1746182.406721 101
+cycle:  88 max_shift: 0.001669 LBFGS: function start/end, n_calls: -1746182.406721 -1746182.414351 101
+cycle:  89 max_shift: 0.001614 LBFGS: function start/end, n_calls: -1746182.414351 -1746182.427292 101
+cycle:  90 max_shift: 0.001905 LBFGS: function start/end, n_calls: -1746182.427292 -1746182.438812 101
+cycle:  91 max_shift: 0.002154 LBFGS: function start/end, n_calls: -1746182.438812 -1746182.453998 101
+cycle:  92 max_shift: 0.003121 LBFGS: function start/end, n_calls: -1746182.453998 -1746182.431182 101
+cycle:  93 max_shift: 0.002656 LBFGS: function start/end, n_calls: -1746182.431182 -1746182.482947 101
+cycle:  94 max_shift: 0.002372 LBFGS: function start/end, n_calls: -1746182.482947 -1746182.499853 101
+cycle:  95 max_shift: 0.001349 LBFGS: function start/end, n_calls: -1746182.499853 -1746182.509129 101
+cycle:  96 max_shift: 0.001230 LBFGS: function start/end, n_calls: -1746182.509129 -1746182.515861 101
+cycle:  97 max_shift: 0.003149 LBFGS: function start/end, n_calls: -1746182.515861 -1746182.539425 101
+cycle:  98 max_shift: 0.001624 LBFGS: function start/end, n_calls: -1746182.539425 -1746182.537330 101
+cycle:  99 max_shift: 0.001659 LBFGS: function start/end, n_calls: -1746182.537330 -1746182.560295 101
+final: bond:  0.008 angle:   0.98 clash:   0.0 rota:  0.00 rama: f: 100.00 o:   0.00 Z:   0.60 cb:   0.00
+See 6_refined.pdb in pdb folder.
+Time: 927.4039
