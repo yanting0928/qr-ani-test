@@ -1,0 +1,1 @@
+qr.refine 1us0H_mod_P1box.pdb  mode=opt  max_bond_rmsd=0.03  stpmax=0.2 gradient_only=true use_convergence_test=true  opt_log=1 restraints=qm engine_name=torchani clustering=false > 1us0_opt.log &
