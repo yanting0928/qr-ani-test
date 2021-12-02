@@ -68,6 +68,7 @@ class aniserver_tg_calculator(object):
 
   def __init__(self, model):
     self.model = model
+    self.f_start = None
     self.x = flex.double(self.model.size()*3, 0)
     self.sites_cart = self.model.get_sites_cart()
     self.ase_atoms = ase_atoms_from_model(model=self.model)
@@ -75,8 +76,7 @@ class aniserver_tg_calculator(object):
   def get_shift(self):
     return self.x
 
-  def target_and_gradients(self, x):
-    self.x = x
+  def target_and_gradients(self):
     calc = ANIRPCCalculator()
     self.model.set_sites_cart(sites_cart = self.sites_cart+flex.vec3_double(self.x))
     self.ase_atoms = ase_atoms_from_model(model=self.model)
@@ -85,9 +85,15 @@ class aniserver_tg_calculator(object):
     gradients = self.ase_atoms.get_forces().tolist()
     g = flex.double([g for gradient in gradients for g in gradient])
     g = g * (-1)
-    return target, g.as_double()
+    self.f, self.g = target, g.as_double()
+    if(self.f_start is None):
+      self.f_start = self.f
+    return self.f, self.g
 
-  def apply_shift(self):
+  def compute_functional_and_gradients(self):
+    return self.target_and_gradients()
+
+  def apply_x(self):
     self.model.set_sites_cart(
       sites_cart = self.sites_cart + flex.vec3_double(self.x))
 
