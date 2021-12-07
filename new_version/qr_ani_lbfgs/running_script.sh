@@ -1,4 +1,4 @@
-for i in 0.3  0.6  0.9  1.2  1.5; do
+for i in 1.5 1.2 0.9 0.6 0.3; do
 cd $i
 
 for k in $(seq 0 9);do

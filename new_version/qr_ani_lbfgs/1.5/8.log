@@ -129,6 +129,8 @@ Running refinement
    output_folder_name = "pdb"
    rst_file = None
    dump_gradients = None
+/home/yanting/phenix_conda/modules/qrefine/plugin/ase/torchani_qr.py:19: DeprecationWarning: the sets module is deprecated
+  from sets import Set
 
 Setting QM defaults
   Setting QM method to HF
@@ -136,11 +138,11 @@ Setting QM defaults
 
 
 ***********************************************************
-restart info will be stored in /home/yanting/work/aniserver_1_qr/ani_qr_test/cctbx_lbfgs/qr-ani-test/new_version/qr_ani_lbfgs/1.5/pdb/8.rst.pickle
+restart info will be stored in /home/yanting/work/aniserver_1_qr/ani_qr_test/cctbx_lbfgs/qr-ani-test/new_version/qr_ani_lbfgs_3/1.5/pdb/8.rst.pickle
 ***********************************************************
 
 start: bond:  0.012 angle:   1.66 clash:   0.0 rota:  0.00 rama: f:  72.73 o:   0.00 Z:  -6.08 cb:   0.00
-cycle:   0 max_shift: 1.661534 LBFGS: function start/end, n_calls: -1746100.055363 -1746134.692378 5001
-final: bond:  0.030 angle:   1.97 clash:   0.0 rota:  0.00 rama: f:  90.91 o:   0.00 Z:  -4.13 cb:   0.00
+cycle:   0 max_shift: 2.936713 LBFGS: function start/end, n_calls: -75718.064222 -75721.538515 2502
+final: bond:  0.008 angle:   1.47 clash:   0.0 rota:  0.00 rama: f: 100.00 o:   0.00 Z:  -4.11 cb:   0.00
 See 8_refined.pdb in pdb folder.
-Time: 442.8505
+Time: 183.3887
